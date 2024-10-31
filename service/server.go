@@ -1,4 +1,4 @@
-package apilib
+package service
 
 import (
 	"context"
@@ -23,8 +23,7 @@ type ServerConfig struct {
 type Server struct {
 	ctx context.Context
 	cfg ServerConfig
-	//r   chi.Router
-	l *logging.Logger
+	l   *logging.Logger
 }
 
 func New(cxt context.Context, cfg ServerConfig) *Server {
