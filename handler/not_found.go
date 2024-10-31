@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/kaibling/apilib/envelope"
-	apierror "github.com/kaibling/apilib/error"
+	"github.com/kaibling/apiforge/envelope"
+	apierror "github.com/kaibling/apiforge/error"
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {

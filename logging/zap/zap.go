@@ -1,7 +1,7 @@
 package zap
 
 import (
-	"github.com/kaibling/apilib/logging"
+	"github.com/kaibling/apiforge/logging"
 	"go.uber.org/zap"
 )
 

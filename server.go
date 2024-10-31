@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/kaibling/apilib/logging"
-	"github.com/kaibling/apilib/logging/zap"
+	"github.com/kaibling/apiforge/logging"
+	"github.com/kaibling/apiforge/logging/zap"
 )
 
 type ServerConfig struct {

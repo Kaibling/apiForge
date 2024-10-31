@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/kaibling/apilib/logging"
-	"github.com/kaibling/apilib/logging/zap"
+	"github.com/kaibling/apiforge/logging"
+	"github.com/kaibling/apiforge/logging/zap"
 )
 
 func BuildLogger(logDriver string) logging.LogWriter {
