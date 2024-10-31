@@ -1,0 +1,14 @@
+{
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+  "workspaceFolder": "/apiforge",
+
+    "customizations": {
+      "vscode": {
+        "extensions": ["golang.Go"]
+      }
+    },
+    "remoteEnv": {
+      "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}/.."
+  }
+  }

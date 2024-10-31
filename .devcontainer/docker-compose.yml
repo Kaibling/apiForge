@@ -1,0 +1,11 @@
+version: "3.4"
+services:
+  app:
+   build: .
+   volumes:
+    - "../.:/apiforge"
+   working_dir: "/apiforge"
+   #command: "bash startpoint.sh"
+   command: "tail -f /dev/null"
+   ports:
+      - 8080:8080
