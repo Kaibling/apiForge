@@ -12,13 +12,13 @@ type ApiError struct {
 	StatusCode int
 }
 
-// func new(err error, status int) ApiError {
-// 	return ApiError{msg: err.Error(), StatusCode: status}
-// }
+func New(err error, status int) ApiError {
+	return ApiError{msg: err.Error(), StatusCode: status}
+}
 
-// func NewGeneric(err error) ApiError {
-// 	return ApiError{msg: err.Error(), StatusCode: http.StatusInternalServerError}
-// }
+func NewGeneric(err error) ApiError {
+	return ApiError{msg: err.Error(), StatusCode: http.StatusInternalServerError}
+}
 
 func (e ApiError) Error() string {
 	return e.msg
