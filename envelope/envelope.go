@@ -14,7 +14,7 @@ type Envelope struct {
 	Success        bool   `json:"success"`
 	RequestID      string `json:"request_id"`
 	Time           string `json:"time"`
-	Response       any    `json:"response"`
+	Data           any    `json:"data"`
 	Error          string `json:"error,omitempty"`
 	Message        string `json:"message,omitempty"`
 	HTTPStatusCode int    `json:"-"`
@@ -30,7 +30,7 @@ func (e *Envelope) Render(w http.ResponseWriter, r *http.Request) error {
 func (e *Envelope) SetResponse(resp any) *Envelope {
 	e.Success = true
 	//e.Time = time.Now().Format(time.RFC822)
-	e.Response = resp
+	e.Data = resp
 	return e
 }
 
@@ -43,7 +43,7 @@ func (e *Envelope) SetSuccess() *Envelope {
 func (e *Envelope) SetError(err apierror.HTTPError) *Envelope {
 	e.Success = false
 	e.HTTPStatusCode = err.HTTPStatus()
-	e.Response = err.Error()
+	e.Data = err.Error()
 	return e
 }
 
