@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/kaibling/apiforge/apictx"
+	"github.com/kaibling/apiforge/ctxkeys"
 )
 
 func SaveBody(next http.Handler) http.Handler {
@@ -16,7 +16,7 @@ func SaveBody(next http.Handler) http.Handler {
 			return
 		}
 		r.Body = io.NopCloser(bytes.NewBuffer(b))
-		ctx := context.WithValue(r.Context(), apictx.String("byte_body"), b)
+		ctx := context.WithValue(r.Context(), ctxkeys.ByteBodyKey, b)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

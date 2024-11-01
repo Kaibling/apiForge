@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/kaibling/apiforge/apictx"
+	"github.com/kaibling/apiforge/ctxkeys"
 	"github.com/kaibling/apiforge/envelope"
 	"github.com/kaibling/apiforge/logging"
 )
@@ -19,19 +19,19 @@ func LogRequest(next http.Handler) http.Handler {
 		finished := time.Now()
 		duration := finished.Sub(start)
 		url := r.URL.String()
-		body := string(apictx.GetValue(r.Context(), "byte_body").([]uint8))
+		body := string(ctxkeys.GetValue(r.Context(), ctxkeys.ByteBodyKey).([]uint8))
 		method := r.Method
 		var username string
-		if u, ok := apictx.GetValue(r.Context(), "user_name").(string); ok {
+		if u, ok := ctxkeys.GetValue(r.Context(), ctxkeys.UserNameKey).(string); ok {
 			username = u
 		} else {
 			username = "unauthenticated"
 		}
-		requestID := apictx.GetValue(r.Context(), "request_id").(string)
+		requestID := ctxkeys.GetValue(r.Context(), ctxkeys.RequestIDKey).(string)
 
-		e := apictx.GetValue(r.Context(), "envelope").(*envelope.Envelope)
+		e := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*envelope.Envelope)
 		//fmt.Printf("duration: %s\n", duration)
-		logger := apictx.GetValue(r.Context(), "logger").(*logging.Logger)
+		logger := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(*logging.Logger)
 
 		ld := logging.LogData{
 			ReqId:          requestID,

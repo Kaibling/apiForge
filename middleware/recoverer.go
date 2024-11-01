@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/kaibling/apiforge/apictx"
+	"github.com/kaibling/apiforge/ctxkeys"
 	"github.com/kaibling/apiforge/envelope"
 	apierror "github.com/kaibling/apiforge/error"
 	"github.com/kaibling/apiforge/logging"
@@ -16,10 +16,10 @@ func Recoverer(next http.Handler) http.Handler {
 		defer func() {
 			if err := recover(); err != nil {
 				errMessage := fmt.Sprintf("Panic: %v\n%s", err, debug.Stack())
-				logger := apictx.GetValue(r.Context(), "logger").(*logging.Logger)
+				logger := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(*logging.Logger)
 				logger.LogLine(errMessage)
 
-				e, ok := apictx.GetValue(r.Context(), "envelope").(*envelope.Envelope)
+				e, ok := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*envelope.Envelope)
 				if ok {
 					e.SetError(apierror.ServerError).Finish(w, r)
 					return

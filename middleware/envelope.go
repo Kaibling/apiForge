@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/kaibling/apiforge/apictx"
+	"github.com/kaibling/apiforge/ctxkeys"
 	"github.com/kaibling/apiforge/envelope"
 	"github.com/kaibling/apiforge/lib/utils"
 )
@@ -27,8 +27,8 @@ func InitEnvelope(next http.Handler) http.Handler {
 		// ls := services.NewLogService(lr)
 		env := envelope.New()
 		env.RequestID = reqID
-		ctx := context.WithValue(r.Context(), apictx.String("envelope"), env)
-		ctx = context.WithValue(ctx, apictx.String("request_id"), reqID)
+		ctx := context.WithValue(r.Context(), ctxkeys.EnvelopeKey, env)
+		ctx = context.WithValue(ctx, ctxkeys.RequestIDKey, reqID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

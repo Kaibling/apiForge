@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-chi/render"
-	"github.com/kaibling/apiforge/apictx"
+	"github.com/kaibling/apiforge/ctxkeys"
 	apierror "github.com/kaibling/apiforge/error"
 	"github.com/kaibling/apiforge/route"
 )
@@ -55,5 +55,5 @@ func (e *Envelope) Finish(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReadEnvelope(r *http.Request) *Envelope {
-	return apictx.GetValue(r.Context(), "envelope").(*Envelope)
+	return ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope)
 }
