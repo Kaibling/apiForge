@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/kaibling/apiforge/api"
 	"github.com/kaibling/apiforge/logging"
 	"github.com/kaibling/apiforge/logging/zap"
 )
@@ -35,6 +36,8 @@ func (s *Server) AddCustomLogger(lw logging.LogWriter) {
 }
 
 func (s *Server) StartBlocking(r chi.Router) {
+	r.Mount("/", api.AddReadyChecks())
+
 	if s.l == nil {
 		s.l = logging.New(zap.New())
 	}
