@@ -40,6 +40,16 @@ func ParseQueryParams(next http.Handler) http.Handler {
 				qp.Order = val[0]
 			}
 		}
+		if val, ok := r.URL.Query()["before"]; ok {
+			if len(val) > 0 {
+				qp.Before = val[0]
+			}
+		}
+		if val, ok := r.URL.Query()["after"]; ok {
+			if len(val) > 0 {
+				qp.After = val[0]
+			}
+		}
 
 		ctx := context.WithValue(r.Context(), ctxkeys.QueryParamsKey, qp)
 		next.ServeHTTP(w, r.WithContext(ctx))
