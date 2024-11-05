@@ -7,14 +7,14 @@ import (
 	"strconv"
 
 	"github.com/kaibling/apiforge/ctxkeys"
-	"github.com/kaibling/apiforge/queryparams"
+	"github.com/kaibling/apiforge/params"
 )
 
 func ParseQueryParams(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// TODO hardcoded default values
-		qp := queryparams.QueryParams{
+		qp := params.Pagination{
 			Limit: 20,
 			Order: "asc",
 		}
@@ -42,12 +42,12 @@ func ParseQueryParams(next http.Handler) http.Handler {
 		}
 		if val, ok := r.URL.Query()["before"]; ok {
 			if len(val) > 0 {
-				qp.Before = val[0]
+				qp.Before = &val[0]
 			}
 		}
 		if val, ok := r.URL.Query()["after"]; ok {
 			if len(val) > 0 {
-				qp.After = val[0]
+				qp.After = &val[0]
 			}
 		}
 
