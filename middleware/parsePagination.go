@@ -10,7 +10,7 @@ import (
 	"github.com/kaibling/apiforge/params"
 )
 
-func ParseQueryParams(next http.Handler) http.Handler {
+func ParsePagination(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// TODO hardcoded default values
@@ -51,7 +51,7 @@ func ParseQueryParams(next http.Handler) http.Handler {
 			}
 		}
 
-		ctx := context.WithValue(r.Context(), ctxkeys.QueryParamsKey, qp)
+		ctx := context.WithValue(r.Context(), ctxkeys.PaginationKey, qp)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

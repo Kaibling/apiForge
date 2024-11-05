@@ -12,14 +12,14 @@ import (
 )
 
 type Envelope struct {
-	Success        bool              `json:"success"`
-	RequestID      string            `json:"request_id"`
-	Time           string            `json:"time"`
-	Data           any               `json:"data"`
-	Error          string            `json:"error,omitempty"`
-	Message        string            `json:"message,omitempty"`
-	HTTPStatusCode int               `json:"-"`
-	Pagination     params.Pagination `json:"pagination,omitempty"`
+	Success        bool               `json:"success"`
+	RequestID      string             `json:"request_id"`
+	Time           string             `json:"time"`
+	Data           any                `json:"data"`
+	Error          string             `json:"error,omitempty"`
+	Message        string             `json:"message,omitempty"`
+	HTTPStatusCode int                `json:"-"`
+	Pagination     *params.Pagination `json:"pagination,omitempty"`
 }
 
 func New() *Envelope {
@@ -43,7 +43,7 @@ func (e *Envelope) SetSuccess() *Envelope {
 }
 
 func (e *Envelope) SetPagination(p params.Pagination) *Envelope {
-	e.Pagination = p
+	e.Pagination = &p
 	return e
 }
 

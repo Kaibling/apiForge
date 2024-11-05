@@ -14,7 +14,7 @@ const TokenKey String = "token"
 const EnvelopeKey String = "envelope"
 const LoggerKey String = "logger"
 const ByteBodyKey String = "bytebody"
-const QueryParamsKey String = "queryparams"
+const PaginationKey String = "pagination"
 const AppConfigKey String = "appconfig"
 
 func GetValue(ctx context.Context, key String) any {
