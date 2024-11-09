@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/kaibling/apiforge/ctxkeys"
 	"github.com/kaibling/apiforge/params"
@@ -16,7 +17,7 @@ func ParsePagination(next http.Handler) http.Handler {
 		// TODO hardcoded default values
 		qp := params.Pagination{
 			Limit: 20,
-			Order: "asc",
+			Order: "ASC",
 		}
 
 		if val, ok := r.URL.Query()["filter"]; ok {
@@ -37,7 +38,10 @@ func ParsePagination(next http.Handler) http.Handler {
 
 		if val, ok := r.URL.Query()["order"]; ok {
 			if len(val) > 0 {
-				qp.Order = val[0]
+				p := strings.ToUpper(val[0])
+				if p == "DESC" || p == "ASC" {
+					qp.Order = p
+				}
 			}
 		}
 		if val, ok := r.URL.Query()["before"]; ok {
