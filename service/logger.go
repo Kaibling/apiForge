@@ -5,11 +5,16 @@ import (
 	"github.com/kaibling/apiforge/logging/zap"
 )
 
-func BuildLogger(logDriver string) logging.LogWriter {
-	switch logDriver {
+type LogConfig struct {
+	LogDriver string
+	LogLevel  string
+}
+
+func BuildLogger(cfg LogConfig) logging.Writer {
+	switch cfg.LogDriver {
 	case "zap":
-		return logging.New(zap.New())
+		return zap.New(cfg.LogLevel)
 	default:
-		return logging.New(zap.New())
+		return zap.New(cfg.LogLevel)
 	}
 }

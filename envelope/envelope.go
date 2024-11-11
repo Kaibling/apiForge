@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/kaibling/apiforge/ctxkeys"
 	apierror "github.com/kaibling/apiforge/error"
+	"github.com/kaibling/apiforge/logging"
 	"github.com/kaibling/apiforge/params"
 	"github.com/kaibling/apiforge/route"
 )
@@ -51,16 +52,26 @@ func (e *Envelope) SetError(err apierror.HTTPError) *Envelope {
 	e.Success = false
 	e.HTTPStatusCode = err.HTTPStatus()
 	e.Data = err.Error()
+	e.Error = err.Error()
 	return e
 }
 
-func (e *Envelope) Finish(w http.ResponseWriter, r *http.Request) {
+func (e *Envelope) Finish(w http.ResponseWriter, r *http.Request, logger logging.Writer) {
 	e.Time = time.Now().Format(time.RFC3339)
 	//e.Time = time.Now().Format(time.RFC822)
+	//log error
+	if !e.Success {
+		logger.ErrorMsg(e.Error)
+	}
 	render.Status(r, e.HTTPStatusCode)
 	route.Render(w, r, e)
 }
 
 func ReadEnvelope(r *http.Request) *Envelope {
 	return ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope)
+}
+func GetEnvelopeAndLogger(r *http.Request) (*Envelope, logging.Writer) {
+	l := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
+	e := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope)
+	return e, l
 }

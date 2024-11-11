@@ -15,27 +15,28 @@ import (
 type ServerConfig struct {
 	BindingIP   string
 	BindingPort string
+	LogLevel    string
 }
 
 type Server struct {
 	ctx context.Context
 	cfg ServerConfig
-	l   *logging.Logger
+	l   logging.Writer
 }
 
 func New(cxt context.Context, cfg ServerConfig) *Server {
 	return &Server{ctx: cxt, cfg: cfg}
 }
 
-func (s *Server) AddCustomLogger(lw logging.LogWriter) {
-	s.l = logging.New(lw)
+func (s *Server) AddCustomLogger(lw logging.Writer) {
+	s.l = lw
 }
 
 func (s *Server) Start(r chi.Router) error {
 	r.Mount("/", api.AddReadyChecks())
 
 	if s.l == nil {
-		s.l = logging.New(zap.New())
+		s.l = zap.New(s.cfg.LogLevel)
 	}
 
 	listeningStr := fmt.Sprintf("%s:%s", s.cfg.BindingIP, s.cfg.BindingPort)
@@ -45,9 +46,9 @@ func (s *Server) Start(r chi.Router) error {
 		<-s.ctx.Done()
 		err := server.Shutdown(s.ctx)
 		if err != nil {
-			s.l.LogLine(err.Error())
+			s.l.Error(err)
 		}
-		s.l.LogLine("shutting down api server")
+		s.l.Info("shutting down api server")
 	}()
 
 	go func() {
@@ -56,6 +57,6 @@ func (s *Server) Start(r chi.Router) error {
 			return
 		}
 	}()
-	s.l.LogLine(fmt.Sprintf("listening on %s", listeningStr))
+	s.l.Info(fmt.Sprintf("listening on %s", listeningStr))
 	return nil
 }

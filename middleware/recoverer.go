@@ -16,12 +16,12 @@ func Recoverer(next http.Handler) http.Handler {
 		defer func() {
 			if err := recover(); err != nil {
 				errMessage := fmt.Sprintf("Panic: %v\n%s", err, debug.Stack())
-				logger := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(*logging.Logger)
-				logger.LogLine(errMessage)
+				logger := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
+				logger.ErrorMsg(errMessage)
 
 				e, ok := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*envelope.Envelope)
 				if ok {
-					e.SetError(apierror.ServerError).Finish(w, r)
+					e.SetError(apierror.ServerError).Finish(w, r, logger)
 					return
 				}
 				// if no envelope available, send 500

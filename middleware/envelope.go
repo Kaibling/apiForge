@@ -18,13 +18,6 @@ func InitEnvelope(next http.Handler) http.Handler {
 			reqID = utils.NewULID().String()
 		}
 
-		// db := apictx.GetContext("db", r).(*gorm.DB)
-		// username, ok := apictx.GetContext("username", r).(string)
-		// if !ok {
-		// 	username = "unauthenticated"
-		// }
-		// lr := gormrepo.NewLogRepo(db, username)
-		// ls := services.NewLogService(lr)
 		env := envelope.New()
 		env.RequestID = reqID
 		ctx := context.WithValue(r.Context(), ctxkeys.EnvelopeKey, env)

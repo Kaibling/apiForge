@@ -8,6 +8,6 @@ import (
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
-	e := envelope.ReadEnvelope(r)
-	e.SetError(apierror.NotFound).Finish(w, r)
+	e, l := envelope.GetEnvelopeAndLogger(r)
+	e.SetError(apierror.NotFound).Finish(w, r, l)
 }

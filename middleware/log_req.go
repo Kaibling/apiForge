@@ -31,7 +31,7 @@ func LogRequest(next http.Handler) http.Handler {
 
 		e := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*envelope.Envelope)
 		//fmt.Printf("duration: %s\n", duration)
-		logger := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(*logging.Logger)
+		logger := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
 
 		ld := logging.LogData{
 			ReqId:          requestID,
