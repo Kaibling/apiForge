@@ -10,7 +10,7 @@ type LogConfig struct {
 	LogLevel  string
 }
 
-func BuildLogger(cfg LogConfig) logging.Writer {
+func BuildLogger(cfg LogConfig) logging.Writer { //nolint: ireturn, nolintlint
 	switch cfg.LogDriver {
 	case "zap":
 		return zap.New(cfg.LogLevel)

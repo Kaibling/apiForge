@@ -15,6 +15,7 @@ func SaveBody(next http.Handler) http.Handler {
 		if err != nil {
 			return
 		}
+
 		r.Body = io.NopCloser(bytes.NewBuffer(b))
 		ctx := context.WithValue(r.Context(), ctxkeys.ByteBodyKey, b)
 		next.ServeHTTP(w, r.WithContext(ctx))

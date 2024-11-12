@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/go-chi/render"
+	"github.com/kaibling/apiforge/apierror"
 	"github.com/kaibling/apiforge/ctxkeys"
-	apierror "github.com/kaibling/apiforge/error"
 	"github.com/kaibling/apiforge/logging"
 	"github.com/kaibling/apiforge/params"
 	"github.com/kaibling/apiforge/route"
@@ -26,25 +26,27 @@ type Envelope struct {
 func New() *Envelope {
 	return &Envelope{HTTPStatusCode: http.StatusOK}
 }
-func (e *Envelope) Render(w http.ResponseWriter, r *http.Request) error {
+
+func (e *Envelope) Render(w http.ResponseWriter, r *http.Request) error { //nolint: revive
 	return nil
 }
 
 func (e *Envelope) SetResponse(resp any) *Envelope {
 	e.Success = true
-	//e.Time = time.Now().Format(time.RFC822)
 	e.Data = resp
+
 	return e
 }
 
 func (e *Envelope) SetSuccess() *Envelope {
 	e.Success = true
-	//e.Time = time.Now().Format(time.RFC822)
+
 	return e
 }
 
 func (e *Envelope) SetPagination(p params.Pagination) *Envelope {
 	e.Pagination = &p
+
 	return e
 }
 
@@ -53,25 +55,35 @@ func (e *Envelope) SetError(err apierror.HTTPError) *Envelope {
 	e.HTTPStatusCode = err.HTTPStatus()
 	e.Data = err.Error()
 	e.Error = err.Error()
+
 	return e
 }
 
 func (e *Envelope) Finish(w http.ResponseWriter, r *http.Request, logger logging.Writer) {
 	e.Time = time.Now().Format(time.RFC3339)
-	//e.Time = time.Now().Format(time.RFC822)
-	//log error
+
 	if !e.Success {
 		logger.ErrorMsg(e.Error)
 	}
+
 	render.Status(r, e.HTTPStatusCode)
 	route.Render(w, r, e)
 }
 
 func ReadEnvelope(r *http.Request) *Envelope {
-	return ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope)
+	return ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope) //nolint:forcetypeassert
 }
-func GetEnvelopeAndLogger(r *http.Request) (*Envelope, logging.Writer) {
-	l := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
-	e := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope)
-	return e, l
+
+func GetEnvelopeAndLogger(r *http.Request) (*Envelope, logging.Writer, error) { //nolint: ireturn
+	l, ok := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
+	if !ok {
+		return nil, nil, apierror.ErrContextMissingLogger
+	}
+
+	e, ok := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope)
+	if !ok {
+		return nil, nil, apierror.ErrContextMissingEnvelope
+	}
+
+	return e, l, nil
 }

@@ -27,8 +27,10 @@ func New(logLevel string) *Logger {
 		OutputPaths:   []string{"stdout"},                       // Write logs to stdout
 		EncoderConfig: zap.NewProductionEncoderConfig(),         // Encoder configuration
 	}
+
 	logger, err := cfg.Build()
 	if err != nil {
+		// todo remove panic
 		panic(err)
 	}
 
@@ -38,13 +40,11 @@ func New(logLevel string) *Logger {
 		Fields:   map[string]zapcore.Field{},
 		logLevel: logLevel,
 	}
-	//defer logger.Sync()
-
 }
 
 func logCopy(log *Logger) *Logger {
 	newLog := New(log.logLevel)
-	//newLog.Fields = make(map[string]zapcore.Field)
+
 	for k, v := range log.Fields {
 		newLog.Fields[k] = v
 	}
@@ -61,11 +61,11 @@ type Logger struct {
 
 func (l *Logger) LogRequest(data logging.LogData) {
 	l.l.Info("request",
-		zap.String("req_id", data.ReqId),
+		zap.String("req_id", data.RequestID),
 		zap.String("url", data.URL),
 		zap.String("user", data.UserName),
 		zap.Int("duration", data.Duration),
-		zap.Int("http_status_code", data.HttpStatusCode),
+		zap.Int("http_status_code", data.HTTPStatusCode),
 		zap.Any("request_body", data.RequestBody),
 		zap.Any("response_body", data.ResponseBody),
 		zap.String("method", data.Method),
@@ -73,7 +73,7 @@ func (l *Logger) LogRequest(data logging.LogData) {
 }
 
 func (l *Logger) fields() []zapcore.Field {
-	var values []zapcore.Field
+	values := []zapcore.Field{}
 	for _, value := range l.Fields {
 		values = append(values, value)
 	}
@@ -84,9 +84,11 @@ func (l *Logger) fields() []zapcore.Field {
 func (l *Logger) AddStringField(key string, value string) {
 	l.Fields[key] = zap.String(key, value)
 }
+
 func (l *Logger) AddIntField(key string, value int) {
 	l.Fields[key] = zap.Int(key, value)
 }
+
 func (l *Logger) AddAnyField(key string, value any) {
 	l.Fields[key] = zap.Any(key, value)
 }
@@ -111,7 +113,7 @@ func (l *Logger) Info(msg string) {
 	l.l.Info(msg, l.fields()...)
 }
 
-func (l *Logger) NewScope(value string) logging.Writer {
+func (l *Logger) NewScope(value string) logging.Writer { //nolint: ireturn, nolintlint
 	newLogger := logCopy(l)
 	newLogger.Fields["scope"] = zap.Any("scope", value)
 

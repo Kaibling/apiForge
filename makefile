@@ -40,8 +40,19 @@ current-tag:
 	@echo "Current tag: $(CURRENT_TAG)"
 	@echo "Branch: $(BRANCH)"
 
-pkg-update:
-	go get -u
-	go mod tidy
 deps:
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.61.0
+	go install golang.org/x/vuln/cmd/govulncheck@latest
+	go install mvdan.cc/gofumpt@latest
+	go install github.com/daixiang0/gci@latest
+
+fmt:
+	gofumpt -l -w .
+
+vuln:
+	govulncheck ./...
+
+gci:
+	gci write --skip-generated -s standard -s default .
+
+full-lint: gci fmt lint vuln

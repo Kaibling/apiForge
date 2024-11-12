@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 
 func LogRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		start := time.Now()
 
 		next.ServeHTTP(w, r)
@@ -19,33 +19,51 @@ func LogRequest(next http.Handler) http.Handler {
 		finished := time.Now()
 		duration := finished.Sub(start)
 		url := r.URL.String()
-		body := string(ctxkeys.GetValue(r.Context(), ctxkeys.ByteBodyKey).([]uint8))
 		method := r.Method
+
+		body, ok := ctxkeys.GetValue(r.Context(), ctxkeys.ByteBodyKey).([]uint8)
+		if !ok {
+			fmt.Println("bytebody is missing in context") //nolint: forbidigo
+		}
+
 		var username string
+
 		if u, ok := ctxkeys.GetValue(r.Context(), ctxkeys.UserNameKey).(string); ok {
 			username = u
 		} else {
 			username = "unauthenticated"
 		}
-		requestID := ctxkeys.GetValue(r.Context(), ctxkeys.RequestIDKey).(string)
 
-		e := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*envelope.Envelope)
-		//fmt.Printf("duration: %s\n", duration)
-		logger := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
+		requestID, ok := ctxkeys.GetValue(r.Context(), ctxkeys.RequestIDKey).(string)
+		if !ok {
+			fmt.Println("request_id is missing in context") //nolint: forbidigo
+		}
+
+		e, ok := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*envelope.Envelope)
+		if !ok {
+			fmt.Println("envelope is missing in context") //nolint: forbidigo
+		}
+
+		logger, ok := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
+		if !ok {
+			fmt.Println("logger is missing in context") //nolint: forbidigo
+		}
 
 		ld := logging.LogData{
-			ReqId:          requestID,
+			RequestID:      requestID,
 			URL:            url,
-			HttpStatusCode: e.HTTPStatusCode,
+			HTTPStatusCode: e.HTTPStatusCode,
 			Duration:       int(duration.Milliseconds()),
 			UserName:       username,
 			Method:         method,
 			ResponseBody:   e,
 		}
+
 		// TODO only censor password and token
 		if url != "/auth/login" {
 			ld.RequestBody = body
 		}
+
 		logger.LogRequest(ld)
 	})
 }

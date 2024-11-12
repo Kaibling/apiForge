@@ -11,12 +11,13 @@ import (
 	"github.com/kaibling/apiforge/params"
 )
 
-func ParsePagination(next http.Handler) http.Handler {
+func ParsePagination(next http.Handler) http.Handler { //nolint: gocognit,cyclop
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		// TODO hardcoded default values
+		defaultLimit := 20
+
 		qp := params.Pagination{
-			Limit: 20,
+			Limit: defaultLimit,
 			Order: "ASC",
 		}
 
@@ -25,11 +26,12 @@ func ParsePagination(next http.Handler) http.Handler {
 				qp.Filter = val[0]
 			}
 		}
+
 		if val, ok := r.URL.Query()["limit"]; ok {
 			if len(val) > 0 {
 				if l, err := strconv.Atoi(val[0]); err != nil {
 					// TODO log error
-					fmt.Println(err.Error())
+					fmt.Println(err.Error()) //nolint: forbidigo
 				} else {
 					qp.Limit = l
 				}
@@ -44,11 +46,13 @@ func ParsePagination(next http.Handler) http.Handler {
 				}
 			}
 		}
+
 		if val, ok := r.URL.Query()["before"]; ok {
 			if len(val) > 0 {
 				qp.Before = &val[0]
 			}
 		}
+
 		if val, ok := r.URL.Query()["after"]; ok {
 			if len(val) > 0 {
 				qp.After = &val[0]

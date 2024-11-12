@@ -12,6 +12,7 @@ import (
 func InitEnvelope(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var reqID string
+
 		if val, ok := r.Header["X-Request-Id"]; ok {
 			reqID = val[0]
 		} else {

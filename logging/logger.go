@@ -1,9 +1,9 @@
 package logging
 
 type LogData struct {
-	ReqId          string
+	RequestID      string
 	URL            string
-	HttpStatusCode int
+	HTTPStatusCode int
 	Duration       int
 	UserName       string
 	Method         string

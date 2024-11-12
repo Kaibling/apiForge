@@ -13,6 +13,7 @@ func AddContext(key ctxkeys.String, value any) func(next http.Handler) http.Hand
 			ctx := context.WithValue(r.Context(), key, value)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
+
 		return http.HandlerFunc(fn)
 	}
 }

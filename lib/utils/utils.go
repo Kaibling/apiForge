@@ -1,14 +1,16 @@
 package utils
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"fmt"
 	"time"
 
-	"github.com/oklog/ulid"
+	"github.com/oklog/ulid/v2"
 )
 
 func NewULID() ulid.ULID {
-	t := time.Now()
-	entropy := ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)
-	return ulid.MustNew(ulid.Timestamp(t), entropy)
+	ulidValue, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+	fmt.Println(err.Error()) //nolint: forbidigo
+
+	return ulidValue
 }

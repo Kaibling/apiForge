@@ -6,16 +6,18 @@ import (
 
 type String string
 
-const UserNameKey String = "user"
-const RequestIDKey String = "requestid"
-const DBConnKey String = "db"
-const UserIDKey String = "userid"
-const TokenKey String = "token"
-const EnvelopeKey String = "envelope"
-const LoggerKey String = "logger"
-const ByteBodyKey String = "bytebody"
-const PaginationKey String = "pagination"
-const AppConfigKey String = "appconfig"
+const (
+	UserNameKey   String = "user"
+	RequestIDKey  String = "requestid"
+	DBConnKey     String = "db"
+	UserIDKey     String = "userid"
+	TokenKey      String = "token"
+	EnvelopeKey   String = "envelope"
+	LoggerKey     String = "logger"
+	ByteBodyKey   String = "bytebody"
+	PaginationKey String = "pagination"
+	AppConfigKey  String = "appconfig"
+)
 
 func GetValue(ctx context.Context, key String) any {
 	return ctx.Value(key)
