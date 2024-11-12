@@ -10,7 +10,9 @@ import (
 
 func NewULID() ulid.ULID {
 	ulidValue, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
-	fmt.Println(err.Error()) //nolint: forbidigo
+	if err != nil {
+		fmt.Println(err.Error()) //nolint: forbidigo
+	}
 
 	return ulidValue
 }
