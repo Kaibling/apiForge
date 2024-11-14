@@ -7,17 +7,23 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func loglevel(logLevel string) zapcore.Level {
-	switch logLevel {
+func loglevel(level string) zapcore.Level {
+	var logLevel zapcore.Level
+
+	switch level {
 	case "debug":
-		return zapcore.DebugLevel
+		logLevel = zapcore.DebugLevel
 	case "info":
-		return zapcore.InfoLevel
+		logLevel = zapcore.InfoLevel
 	case "warn":
-		return zapcore.WarnLevel
+		logLevel = zapcore.WarnLevel
+	case "error":
+		logLevel = zapcore.ErrorLevel
 	default:
-		return zapcore.InfoLevel
+		logLevel = zapcore.InfoLevel
 	}
+
+	return logLevel
 }
 
 func New(logLevel string) *Logger {
@@ -27,6 +33,7 @@ func New(logLevel string) *Logger {
 		OutputPaths:   []string{"stdout"},                       // Write logs to stdout
 		EncoderConfig: zap.NewProductionEncoderConfig(),         // Encoder configuration
 	}
+	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
 	logger, err := cfg.Build()
 	if err != nil {

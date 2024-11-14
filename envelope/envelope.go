@@ -18,6 +18,7 @@ type Envelope struct {
 	Time           string             `json:"time"`
 	Data           any                `json:"data"`
 	Error          string             `json:"error,omitempty"`
+	Errors         []string           `json:"errors,omitempty"`
 	Message        string             `json:"message,omitempty"`
 	HTTPStatusCode int                `json:"-"`
 	Pagination     *params.Pagination `json:"pagination,omitempty"`
@@ -53,11 +54,20 @@ func (e *Envelope) SetPagination(p params.Pagination) *Envelope {
 func (e *Envelope) SetError(err apierror.HTTPError) *Envelope {
 	e.Success = false
 	e.HTTPStatusCode = err.HTTPStatus()
-	e.Data = err.Error()
 	e.Error = err.Error()
+	e.Errors = err.Errors()
 
 	return e
 }
+
+// func (e *Envelope) SetErrors(err apierror.HTTPError) *Envelope {
+// 	e.Success = false
+// 	e.HTTPStatusCode = err.HTTPStatus()
+// 	e.Error = err.Error()
+// 	e.Errors = err.Errors()
+
+// 	return e
+// }
 
 func (e *Envelope) Finish(w http.ResponseWriter, r *http.Request, logger logging.Writer) {
 	e.Time = time.Now().Format(time.RFC3339)
@@ -74,15 +84,21 @@ func ReadEnvelope(r *http.Request) *Envelope {
 	return ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope) //nolint:forcetypeassert
 }
 
-func GetEnvelopeAndLogger(r *http.Request) (*Envelope, logging.Writer, error) { //nolint: ireturn
+func GetEnvelopeAndLogger(r *http.Request) (*Envelope, logging.Writer, apierror.HTTPError) { //nolint: ireturn
+	errs := []string{}
+
 	l, ok := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
 	if !ok {
-		return nil, nil, apierror.ErrContextMissingLogger
+		errs = append(errs, apierror.ErrContextMissingLogger.Error())
 	}
 
 	e, ok := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope)
 	if !ok {
-		return nil, nil, apierror.ErrContextMissingEnvelope
+		errs = append(errs, apierror.ErrContextMissingEnvelope.Error())
+	}
+
+	if len(errs) > 0 {
+		return nil, nil, apierror.NewMulti(apierror.ErrContextMissing, errs)
 	}
 
 	return e, l, nil

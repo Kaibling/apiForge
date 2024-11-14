@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/kaibling/apiforge/apierror"
@@ -11,8 +10,10 @@ import (
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	e, l, err := envelope.GetEnvelopeAndLogger(r)
 	if err != nil {
-		fmt.Println(err.Error()) //nolint: forbidigo
+		e.SetError(err).Finish(w, r, l)
+
+		return
 	}
 
-	e.SetError(apierror.ErrNotFound).Finish(w, r, l)
+	e.SetError(apierror.ErrRouteNotFound).Finish(w, r, l)
 }
