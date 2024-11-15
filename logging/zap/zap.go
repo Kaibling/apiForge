@@ -67,16 +67,15 @@ type Logger struct {
 }
 
 func (l *Logger) LogRequest(data logging.LogData) {
-	l.l.Info("request",
-		zap.String("req_id", data.RequestID),
+	requestFields := []zapcore.Field{
 		zap.String("url", data.URL),
-		zap.String("user", data.UserName),
 		zap.Int("duration", data.Duration),
 		zap.Int("http_status_code", data.HTTPStatusCode),
 		zap.Any("request_body", data.RequestBody),
 		zap.Any("response_body", data.ResponseBody),
-		zap.String("method", data.Method),
-	)
+		zap.String("method", data.Method)}
+	requestFields = append(requestFields, l.fields()...)
+	l.l.Info("request", requestFields...)
 }
 
 func (l *Logger) fields() []zapcore.Field {
