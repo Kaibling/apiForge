@@ -24,47 +24,41 @@ type ServerConfig struct {
 }
 
 func setDefaultConfig(cfg ServerConfig) ServerConfig {
-	newCfg := ServerConfig{}
+	newCfg := ServerConfig{
+		BindingIP:         cfg.BindingIP,
+		BindingPort:       cfg.BindingPort,
+		LogLevel:          cfg.LogLevel,
+		ReadTimeout:       cfg.ReadTimeout,
+		ReadHeaderTimeout: cfg.ReadHeaderTimeout,
+		WriteTimeout:      cfg.WriteTimeout,
+		IdleTimeout:       cfg.IdleTimeout,
+	}
 	if cfg.BindingIP == "" {
 		newCfg.BindingIP = "0.0.0.0"
-	} else {
-		newCfg.BindingIP = cfg.BindingIP
 	}
 
 	if cfg.BindingPort == "" {
 		newCfg.BindingPort = "8080"
-	} else {
-		newCfg.BindingPort = cfg.BindingPort
 	}
 
 	if cfg.LogLevel == "" {
 		newCfg.LogLevel = "info"
-	} else {
-		newCfg.LogLevel = cfg.LogLevel
 	}
 
 	if cfg.ReadTimeout == 0 {
 		newCfg.ReadTimeout = 5
-	} else {
-		newCfg.ReadTimeout = cfg.ReadTimeout
 	}
 
 	if cfg.ReadHeaderTimeout == 0 {
 		newCfg.ReadHeaderTimeout = 2
-	} else {
-		newCfg.ReadHeaderTimeout = cfg.ReadHeaderTimeout
 	}
 
 	if cfg.WriteTimeout == 0 {
 		newCfg.WriteTimeout = 10
-	} else {
-		newCfg.WriteTimeout = cfg.WriteTimeout
 	}
 
 	if cfg.IdleTimeout == 0 {
 		newCfg.IdleTimeout = 15
-	} else {
-		newCfg.IdleTimeout = cfg.IdleTimeout
 	}
 
 	return newCfg
