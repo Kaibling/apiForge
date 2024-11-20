@@ -22,7 +22,19 @@ func (m *MultiError) HasError() bool {
 	return false
 }
 
-func (m *MultiError) GetErrors() []string {
+func (m *MultiError) GetErrors() []error {
+	errString := []error{}
+
+	for _, e := range m.errors {
+		if e != nil {
+			errString = append(errString, e)
+		}
+	}
+
+	return errString
+}
+
+func (m *MultiError) GetStrErrors() []string {
 	errString := []string{}
 
 	for _, e := range m.errors {

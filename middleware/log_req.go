@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/kaibling/apiforge/config"
 	"github.com/kaibling/apiforge/ctxkeys"
 	"github.com/kaibling/apiforge/envelope"
 	"github.com/kaibling/apiforge/logging"
@@ -56,12 +57,17 @@ func LogRequest(next http.Handler) http.Handler {
 			Duration:       int(duration.Milliseconds()),
 			UserName:       username,
 			Method:         method,
-			ResponseBody:   e,
+		}
+
+		if config.LogResponseBody {
+			ld.ResponseBody = e
 		}
 
 		// TODO only censor password and token
 		if url != "/auth/login" {
-			ld.RequestBody = body
+			if config.LogRequestBody {
+				ld.RequestBody = body
+			}
 		}
 
 		logger.LogRequest(ld)

@@ -20,11 +20,13 @@ func InitEnvelope(next http.Handler) http.Handler {
 		} else {
 			reqID = utils.NewULID().String()
 		}
+
 		logger, ok := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
 		if !ok {
 			// TODO error
 			fmt.Println("logger is missing in context") //nolint: forbidigo
 		}
+
 		logger.AddStringField("request_id", reqID)
 		logger.Debug("request_id added")
 

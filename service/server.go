@@ -10,7 +10,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/kaibling/apiforge/api"
 	"github.com/kaibling/apiforge/logging"
-	"github.com/kaibling/apiforge/logging/zap"
 )
 
 type ServerConfig struct {
@@ -81,9 +80,9 @@ func (s *Server) AddCustomLogger(lw logging.Writer) {
 func (s *Server) Start(r chi.Router) error {
 	r.Mount("/", api.AddReadyChecks())
 
-	if s.l == nil {
-		s.l = zap.New(s.cfg.LogLevel)
-	}
+	// if s.l == nil {
+	// 	s.l = zap.New(s.cfg.LogLevel,s.cfg.)
+	// }
 
 	listeningStr := fmt.Sprintf("%s:%s", s.cfg.BindingIP, s.cfg.BindingPort)
 	server := http.Server{

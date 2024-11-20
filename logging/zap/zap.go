@@ -1,6 +1,7 @@
 package zap
 
 import (
+	"github.com/kaibling/apiforge/config"
 	"github.com/kaibling/apiforge/lib/utils"
 	"github.com/kaibling/apiforge/logging"
 	"go.uber.org/zap"
@@ -26,9 +27,16 @@ func loglevel(level string) zapcore.Level {
 	return logLevel
 }
 
-func New(logLevel string) *Logger {
+func New(logLevel string, json bool) *Logger {
+	var encoding string
+	if json {
+		encoding = "json"
+	} else {
+		encoding = "console"
+	}
+
 	cfg := zap.Config{
-		Encoding:      "json",                                   // Output format: json or console
+		Encoding:      encoding,                                 // Output format: json or console
 		Level:         zap.NewAtomicLevelAt(loglevel(logLevel)), // Set the default log level
 		OutputPaths:   []string{"stdout"},                       // Write logs to stdout
 		EncoderConfig: zap.NewProductionEncoderConfig(),         // Encoder configuration
@@ -46,11 +54,12 @@ func New(logLevel string) *Logger {
 		l:        logger,
 		Fields:   map[string]zapcore.Field{},
 		logLevel: logLevel,
+		json:     json,
 	}
 }
 
 func logCopy(log *Logger) *Logger {
-	newLog := New(log.logLevel)
+	newLog := New(log.logLevel, log.json)
 
 	for k, v := range log.Fields {
 		newLog.Fields[k] = v
@@ -64,16 +73,25 @@ type Logger struct {
 	l        *zap.Logger
 	logLevel string
 	Fields   map[string]zapcore.Field
+	json     bool
 }
 
 func (l *Logger) LogRequest(data logging.LogData) {
 	requestFields := []zapcore.Field{
 		zap.String("url", data.URL),
-		zap.Int("duration", data.Duration),
+		zap.Int("duration_ms", data.Duration),
 		zap.Int("http_status_code", data.HTTPStatusCode),
-		zap.Any("request_body", data.RequestBody),
-		zap.Any("response_body", data.ResponseBody),
-		zap.String("method", data.Method)}
+		zap.String("method", data.Method),
+	}
+
+	if config.LogRequestBody {
+		requestFields = append(requestFields, zap.Any("request_body", data.RequestBody))
+	}
+
+	if config.LogResponseBody {
+		requestFields = append(requestFields, zap.Any("response_body", data.ResponseBody))
+	}
+
 	requestFields = append(requestFields, l.fields()...)
 	l.l.Info("request", requestFields...)
 }
