@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/kaibling/apiforge/api"
-	"github.com/kaibling/apiforge/logging"
+	"github.com/kaibling/apiforge/log"
 )
 
 type ServerConfig struct {
@@ -66,14 +66,14 @@ func setDefaultConfig(cfg ServerConfig) ServerConfig {
 type Server struct {
 	ctx context.Context
 	cfg ServerConfig
-	l   logging.Writer
+	l   log.Writer
 }
 
 func New(cxt context.Context, cfg ServerConfig) *Server {
 	return &Server{ctx: cxt, cfg: setDefaultConfig(cfg)}
 }
 
-func (s *Server) AddCustomLogger(lw logging.Writer) {
+func (s *Server) AddCustomLogger(lw log.Writer) {
 	s.l = lw
 }
 
@@ -99,7 +99,7 @@ func (s *Server) Start(r chi.Router) error {
 
 		err := server.Shutdown(s.ctx)
 		if err != nil {
-			s.l.Error(err)
+			s.l.Error("server shutdown", err)
 		}
 
 		s.l.Info("shutting down api server")
@@ -107,7 +107,7 @@ func (s *Server) Start(r chi.Router) error {
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			s.l.Error(err)
+			s.l.Error("http server serving", err)
 		}
 	}()
 	s.l.Info("listening on " + listeningStr)

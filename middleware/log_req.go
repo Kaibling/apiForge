@@ -8,7 +8,7 @@ import (
 	"github.com/kaibling/apiforge/config"
 	"github.com/kaibling/apiforge/ctxkeys"
 	"github.com/kaibling/apiforge/envelope"
-	"github.com/kaibling/apiforge/logging"
+	"github.com/kaibling/apiforge/log"
 )
 
 func LogRequest(next http.Handler) http.Handler {
@@ -45,12 +45,12 @@ func LogRequest(next http.Handler) http.Handler {
 			fmt.Println("envelope is missing in context") //nolint: forbidigo
 		}
 
-		logger, ok := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
+		logger, ok := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(log.Writer)
 		if !ok {
 			fmt.Println("logger is missing in context") //nolint: forbidigo
 		}
 
-		ld := logging.LogData{
+		ld := log.LogData{
 			RequestID:      requestID,
 			URL:            url,
 			HTTPStatusCode: e.HTTPStatusCode,

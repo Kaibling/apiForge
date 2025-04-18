@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
@@ -8,7 +9,7 @@ import (
 	"github.com/kaibling/apiforge/apierror"
 	"github.com/kaibling/apiforge/ctxkeys"
 	"github.com/kaibling/apiforge/envelope"
-	"github.com/kaibling/apiforge/logging"
+	"github.com/kaibling/apiforge/log"
 )
 
 func Recoverer(next http.Handler) http.Handler {
@@ -17,13 +18,14 @@ func Recoverer(next http.Handler) http.Handler {
 		defer func() { //nolint: contextcheck
 			if err := recover(); err != nil {
 				errMessage := fmt.Sprintf("Panic: %v\n%s", err, debug.Stack())
+				nerr := errors.New(errMessage)
 
-				logger, ok := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(logging.Writer)
+				logger, ok := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(log.Writer)
 				if !ok {
 					fmt.Println("logger is missing in context") //nolint: forbidigo
 				}
 
-				logger.ErrorMsg(errMessage)
+				logger.Error(errMessage, nerr)
 
 				e, ok := ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*envelope.Envelope)
 				if ok {
