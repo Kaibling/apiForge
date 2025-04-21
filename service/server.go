@@ -23,44 +23,28 @@ type ServerConfig struct {
 }
 
 func setDefaultConfig(cfg ServerConfig) ServerConfig {
-	newCfg := ServerConfig{
-		BindingIP:         cfg.BindingIP,
-		BindingPort:       cfg.BindingPort,
-		LogLevel:          cfg.LogLevel,
-		ReadTimeout:       cfg.ReadTimeout,
-		ReadHeaderTimeout: cfg.ReadHeaderTimeout,
-		WriteTimeout:      cfg.WriteTimeout,
-		IdleTimeout:       cfg.IdleTimeout,
-	}
 	if cfg.BindingIP == "" {
-		newCfg.BindingIP = "0.0.0.0"
+		cfg.BindingIP = "0.0.0.0"
 	}
-
 	if cfg.BindingPort == "" {
-		newCfg.BindingPort = "8080"
+		cfg.BindingPort = "8080"
 	}
-
 	if cfg.LogLevel == "" {
-		newCfg.LogLevel = "info"
+		cfg.LogLevel = "info"
 	}
-
 	if cfg.ReadTimeout == 0 {
-		newCfg.ReadTimeout = 5
+		cfg.ReadTimeout = 5
 	}
-
 	if cfg.ReadHeaderTimeout == 0 {
-		newCfg.ReadHeaderTimeout = 2
+		cfg.ReadHeaderTimeout = 2
 	}
-
 	if cfg.WriteTimeout == 0 {
-		newCfg.WriteTimeout = 10
+		cfg.WriteTimeout = 10
 	}
-
 	if cfg.IdleTimeout == 0 {
-		newCfg.IdleTimeout = 15
+		cfg.IdleTimeout = 15
 	}
-
-	return newCfg
+	return cfg
 }
 
 type Server struct {
@@ -71,10 +55,6 @@ type Server struct {
 
 func New(cxt context.Context, cfg ServerConfig) *Server {
 	return &Server{ctx: cxt, cfg: setDefaultConfig(cfg)}
-}
-
-func (s *Server) AddCustomLogger(lw log.Writer) {
-	s.l = lw
 }
 
 func (s *Server) Start(r chi.Router) error {

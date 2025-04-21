@@ -11,13 +11,12 @@ import (
 	"github.com/kaibling/apiforge/log"
 )
 
+const requestIDHeader = "x-request-id"
+
 func InitEnvelope(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var reqID string
-
-		if val, ok := r.Header["X-Request-Id"]; ok {
-			reqID = val[0]
-		} else {
+		reqID := r.Header.Get(requestIDHeader)
+		if reqID == "" {
 			reqID = utils.NewULID().String()
 		}
 
@@ -26,13 +25,15 @@ func InitEnvelope(next http.Handler) http.Handler {
 			// TODO error
 			fmt.Println("logger is missing in context") //nolint: forbidigo
 		}
-
-		l.With(log.NewField("request_id", reqID)).Debug("request_id added")
+		reqLogger := l.New("request", log.NewField("request_id", reqID))
+		reqLogger.Debug("request_id added")
 
 		env := envelope.New()
 		env.RequestID = reqID
+
 		ctx := context.WithValue(r.Context(), ctxkeys.EnvelopeKey, env)
 		ctx = context.WithValue(ctx, ctxkeys.RequestIDKey, reqID)
+		ctx = context.WithValue(ctx, ctxkeys.LoggerKey, reqLogger)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
