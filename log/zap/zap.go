@@ -59,10 +59,6 @@ func initLogger(cfg LogConfig) *zap.Logger {
 	}
 	logcfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
-	// Set the application name
-	logcfg.InitialFields = map[string]any{
-		"app": cfg.AppName,
-	}
 	logger, err := logcfg.Build()
 	if err != nil {
 		// todo remove panic

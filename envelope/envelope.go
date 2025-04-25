@@ -84,7 +84,7 @@ func ReadEnvelope(r *http.Request) *Envelope {
 	return ctxkeys.GetValue(r.Context(), ctxkeys.EnvelopeKey).(*Envelope) //nolint:forcetypeassert
 }
 
-func GetEnvelopeAndLogger(r *http.Request) (*Envelope, log.Writer, apierror.HTTPError) { //nolint: ireturn
+func GetEnvelopeAndLogger(r *http.Request, loggername string) (*Envelope, log.Writer, apierror.HTTPError) { //nolint: ireturn
 	errs := []string{}
 
 	l, ok := ctxkeys.GetValue(r.Context(), ctxkeys.LoggerKey).(log.Writer)
@@ -101,5 +101,5 @@ func GetEnvelopeAndLogger(r *http.Request) (*Envelope, log.Writer, apierror.HTTP
 		return nil, nil, apierror.NewMulti(apierror.ErrContextMissing, errs)
 	}
 
-	return e, l, nil
+	return e, l.Named(loggername), nil
 }
