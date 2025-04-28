@@ -26,7 +26,6 @@ func InitEnvelope(next http.Handler) http.Handler {
 			fmt.Println("logger is missing in context") //nolint: forbidigo
 		}
 		reqLogger := l.New("request", log.NewField("request_id", reqID))
-		reqLogger.Debug("request_id added")
 
 		env := envelope.New()
 		env.RequestID = reqID
