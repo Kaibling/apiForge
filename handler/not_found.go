@@ -8,7 +8,7 @@ import (
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
-	e, l, err := envelope.GetEnvelopeAndLogger(r)
+	e, l, err := envelope.GetEnvelopeAndLogger(r, "request")
 	if err != nil {
 		e.SetError(err).Finish(w, r, l)
 

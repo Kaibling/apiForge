@@ -19,6 +19,9 @@ type ServerConfig struct {
 	ReadHeaderTimeout int
 	WriteTimeout      int
 	IdleTimeout       int
+	EnableTLS         bool
+	TLSCertPath       string
+	TLSCertKeyPath    string
 }
 
 func setDefaultConfig(cfg ServerConfig) ServerConfig {
@@ -58,7 +61,7 @@ func New(cxt context.Context, cfg ServerConfig) *Server {
 	return &Server{ctx: cxt, cfg: setDefaultConfig(cfg)}
 }
 
-func (s *Server) Start(r chi.Router,l log.Writer) error {
+func (s *Server) Start(r chi.Router, l log.Writer) error {
 	r.Mount("/health/", api.AddReadyChecks())
 
 	listeningStr := fmt.Sprintf("%s:%s", s.cfg.BindingIP, s.cfg.BindingPort)
@@ -84,9 +87,16 @@ func (s *Server) Start(r chi.Router,l log.Writer) error {
 	}()
 
 	go func() {
-		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		var err error
+		if s.cfg.EnableTLS {
+			err = server.ListenAndServeTLS(s.cfg.TLSCertPath, s.cfg.TLSCertKeyPath)
+		} else {
+			err = server.ListenAndServe()
+		}
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverlogger.Error("http server serving", err)
 		}
+
 	}()
 	serverlogger.Info("listening on " + listeningStr)
 
